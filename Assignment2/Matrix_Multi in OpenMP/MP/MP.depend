@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1586353198 source:c:\users\gxf_lenovo\desktop\mp\main.cpp
+	<iostream>
+	<omp.h>
+	<time.h>
+	<stdlib.h>
+
