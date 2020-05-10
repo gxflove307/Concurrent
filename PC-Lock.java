@@ -17,10 +17,10 @@
           Basket b = new Basket();
           Product p = new Product(b);
           Consumer c = new Consumer(b);
-          Consumer c1 = new Consumer(b);
+         
           new Thread(p).start();
           new Thread(c).start();
-          new Thread(c1).start();
+         
       }
   }
   //馒头
