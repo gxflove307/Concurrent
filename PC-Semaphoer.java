@@ -7,7 +7,7 @@ import java.util.concurrent.Semaphore;
  */
 public class TestSemaphore {
   public static void main(String[] args) {
-    // 启动线程
+    // 启动线程 设置3个生产者和消费者
     for (int i = 0; i <= 3; i++) {
       // 生产者
       new Thread(new Producer()).start();
@@ -57,11 +57,11 @@ public class TestSemaphore {
    */
   static class Warehouse {
     // 非满锁
-    final Semaphore notFull = new Semaphore(10);
+    final Semaphore notFull = new Semaphore(10);//设置临界区容量为10
     // 非空锁
-    final Semaphore notEmpty = new Semaphore(0);
+    final Semaphore notEmpty = new Semaphore(0);//设置非空信号量
     // 核心锁
-    final Semaphore mutex = new Semaphore(1);
+    final Semaphore mutex = new Semaphore(1);//设置互斥信号量
     // 库存容量
     final Object[] items = new Object[10];
     int putptr, takeptr, count;
@@ -73,9 +73,9 @@ public class TestSemaphore {
      */
     public void put(Object x) throws InterruptedException {
       // 保证非满
-      notFull.acquire();
+      notFull.acquire();  //producer获取信号，notFull信号量减一
       // 保证不冲突
-      mutex.acquire();
+      mutex.acquire();//当前进程获得信号，mutex信号量减1，其他线程被阻塞操作共享区块data
       try {
         // 增加库存
         items[putptr] = x;
@@ -84,9 +84,9 @@ public class TestSemaphore {
         ++count;
       } finally {
         // 退出核心区
-        mutex.release();
+        mutex.release(); //mutex信号量+1, 其他线程可以继续信号操作共享区块data
         // 增加非空信号量，允许获取商品
-        notEmpty.release();
+        notEmpty.release();//成功生产数据，notEmpty信号量加1
       }
     }
     /**
@@ -97,9 +97,9 @@ public class TestSemaphore {
      */
     public Object take() throws InterruptedException {
       // 保证非空
-      notEmpty.acquire();
+      notEmpty.acquire(); //customer获取信号，notEmpty信号量减一
       // 核心区
-      mutex.acquire();
+      mutex.acquire();//当前进程获得信号，mutex信号量减1，其他线程被阻塞操作共享区块data
       try {
         // 减少库存
         Object x = items[takeptr];
@@ -109,9 +109,9 @@ public class TestSemaphore {
         return x;
       } finally {
         // 退出核心区
-        mutex.release();
+        mutex.release();//mutex信号量+1, 其他线程可以继续信号操作共享区块data
         // 增加非满的信号量，允许加入商品
-        notFull.release();
+        notFull.release();//成功消耗数据，notFull信号量加1
       }
     }
   }
